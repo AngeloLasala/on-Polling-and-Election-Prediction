@@ -1,3 +1,14 @@
+"""
+A population of N peaple is called to vote. There are 3 party: A, B, C.
+n people are polling and the answer to a simple question:
+"What party did you vote?"
+In the first scenario all polled individuals say the truth about their vote,
+and this answer are collected.
+
+By Bayesian theory of probability and plausible reasoning, the posterior
+P(Na,Nb,Nc|na,nb,nc,I) is computed
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import math
@@ -5,8 +16,22 @@ import itertools
 
 def posterior(Na, Nb):
     """
-    Posterior distribuction in the vase when all
-    the polling person says the true about the vote
+    Posterior distribuction P(Na,Nb,Nc|na,nb,nc,I)
+    in the case when all the polled person says the true about the vote.
+
+    Parameters
+    ----------
+    Na: integer
+        number of people that vote A
+
+    Nb: integer
+        number of people that vote B
+
+    Return
+    ------
+    fun: float
+        Posterior distribuction P(Na,Nb,Nc|na,nb,nc,I) ù
+        computed on Na, Nb
     """
     Nc = N-Na-Nb
     nc = n-na-nb
@@ -16,7 +41,28 @@ def posterior(Na, Nb):
 def result_polling(N, n, na, nb):
     """
     Compute and print the focasted results for an election
-    and return a list of probabilities distribuction of votes"
+    based on the polling data and the background information 
+    (fist scenario).
+    Create a file txt with all results
+
+    Parameters
+    ----------
+    N: integer
+        number of people that vote 
+
+    n: integer
+        number of polled people
+
+    na: integer
+        number of polled people say vote A
+
+    na: integer
+        number of polled people say vote B
+
+    Return
+    ------
+    im: numpy arrey
+        Posterior distribuction P(Na,Nb,Nc|na,nb,nc,I)
     """
     a = np.linspace(0,N,N+1).astype(int)
     grid=[perm for perm in itertools.product(a,a)]
@@ -36,7 +82,7 @@ def result_polling(N, n, na, nb):
     for Na, Nb in grid:
         if (Na>=na) and (Nb>=nb) and (N-Na-Nb>=n-na-nb):
             print(f'{(Na,Nb)}: p={posterior(Na,Nb)}')
-            im[Na][Nb]=posterior(Na,Nb)
+            im[Nb][Na]=posterior(Na,Nb)
 
             tot=tot+posterior(Na,Nb)
             comb=comb+1
@@ -94,10 +140,10 @@ def result_polling(N, n, na, nb):
 
 if __name__ == "__main__":
     #Parameters
-    N = 20
-    n = 5
-    na = 2
-    nb = 2
+    N = 100
+    n = 100
+    na = 50
+    nb = 3
     
     posterior = result_polling(N,n,na,nb)
 
@@ -108,9 +154,6 @@ if __name__ == "__main__":
     plt.ylabel(r'$N_b$')
     CB  = plt.colorbar()
     CB.set_label(r'$p(N_a,N_b|N,n_a,n_b,n_c,I)$')
-
-    
-
 
     plt.show()
             
