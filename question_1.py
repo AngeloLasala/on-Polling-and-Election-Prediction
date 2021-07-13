@@ -61,7 +61,7 @@ def result_polling(N, n, na, nb):
 
     Return
     ------
-    im: numpy arrey
+    im: numpy array
         Posterior distribuction P(Na,Nb,Nc|na,nb,nc,I)
     """
     a = np.linspace(0,N,N+1).astype(int)
