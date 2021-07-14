@@ -141,9 +141,9 @@ def result_polling(N, n, na, nb):
 if __name__ == "__main__":
     #Parameters
     N = 100
-    n = 20
-    na = 9
-    nb = 5
+    n = 100
+    na = 45
+    nb = 27
     
     posterior = result_polling(N,n,na,nb)
 
