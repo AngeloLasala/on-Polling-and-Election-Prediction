@@ -235,14 +235,14 @@ def result_polling(dist):
    
     result_list = []
     for a,b in zip(x_na,x_nb):
-        print(f'posterior: na,nb={a,b}, prob={dist[a][b]}')
-        res=np.array(result_single_polling(N,n,a,b))*dist[a][b]
+        print(f'posterior: na,nb={a,b}, prob={dist[b][a]}')
+        res=np.array(result_single_polling(N,n,a,b))*dist[b][a]
         result_list.append(res)
     result_list=np.vstack(result_list)
 
     final_res=np.sum(result_list,axis=0)
     print(f'FINAL CHECK: {np.sum(final_res)}')
-    with open(f"2 scenario - N:{N}, n:{n}, na:{na}, nb:{nb}, nc:{n-na-nb}", 'w', encoding='utf-8') as file:
+    with open(f"2 scenario - N:{N}, n:{n}, na:{na}, nb:{nb}, nc:{n-na-nb}, p:{p}.txt", 'w', encoding='utf-8') as file:
         file.write(f"Data\n"
                     f"N:{N}\nn:{n}\nna:{na},\nnb:{nb}\nnc:{n-na-nb}\n"
                     f"===== RESULTS FIRST STEP =========\n"
@@ -258,10 +258,10 @@ def result_polling(dist):
 if __name__ == "__main__":
 
     #Parameters
-    N = 20
+    N = 100
     n = 5
     na = 2
-    nb = 2
+    nb = 1
     p = 1
     
     # print(polling_sampling(n,na,nb,p))
@@ -272,13 +272,14 @@ if __name__ == "__main__":
    
     # result_list = []
     # for a,b in zip(x_na,x_nb):
-    #     print(f'posterior: na,nb={a,b}, prob={im[a][b]}')
-    #     res=np.array(result_single_polling(N,n,a,b))*im[a][b]
+    #     print(f'posterior: na,nb={a,b}, prob={im[b][a]}')
+    #     res=np.array(result_single_polling(N,n,a,b))*im[b][a]
     #     result_list.append(res)
     # result_list=np.vstack(result_list)
 
     # final_res=np.sum(result_list,axis=0)
     # print(f'FINAL CHECK: {np.sum(final_res)}')
+    # print(final_res)
     posterior = result_polling(im)
     print(posterior)
 

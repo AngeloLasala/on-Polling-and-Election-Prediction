@@ -112,7 +112,7 @@ def result_polling(N, n, na, nb):
     print(f'check total p: {"%.4f" % tot}\n')
     print(f'combination: {comb}')
 
-    with open(f"First step-N:{N}, n:{n}, na:{na}, nb:{nb}, nc:{n-na-nb}", 'w', encoding='utf-8') as file:
+    with open(f"First step-N:{N}, n:{n}, na:{na}, nb:{nb}, nc:{n-na-nb}.txt", 'w', encoding='utf-8') as file:
         file.write(f"Data\n"
                    f"N:{N}\nn:{n}\nna:{na},\nnb:{nb}\nnc:{n-na-nb}\n"
                    f"===== RESULTS FIRST STEP =========\n"
