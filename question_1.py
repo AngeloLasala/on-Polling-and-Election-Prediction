@@ -140,10 +140,10 @@ def result_polling(N, n, na, nb):
 
 if __name__ == "__main__":
     #Parameters
-    N = 100
-    n = 100
-    na = 45
-    nb = 27
+    N = 99
+    n = 33
+    na = 11
+    nb = 11
     
     posterior = result_polling(N,n,na,nb)
 
