@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import math
 import itertools
 import random
+import time
 
 def polling_sampling(n, na, nb, p):
     """
@@ -259,36 +260,31 @@ if __name__ == "__main__":
 
     #Parameters
     N = 100
-    n = 5
-    na = 2
-    nb = 1
-    p = 1
+    n = 20
+    na = 9
+    nb = 5
+    p = 0.2
     
     # print(polling_sampling(n,na,nb,p))
+    print("START!!!")
+    start_time = time.time()
 
+    
     im = polling_distribuction(1000000)
     x_nb,x_na = np.where(im>0)
-    res_list = []
-   
-    # result_list = []
-    # for a,b in zip(x_na,x_nb):
-    #     print(f'posterior: na,nb={a,b}, prob={im[b][a]}')
-    #     res=np.array(result_single_polling(N,n,a,b))*im[b][a]
-    #     result_list.append(res)
-    # result_list=np.vstack(result_list)
-
-    # final_res=np.sum(result_list,axis=0)
-    # print(f'FINAL CHECK: {np.sum(final_res)}')
-    # print(final_res)
     posterior = result_polling(im)
-    print(posterior)
+
+    end_time = time.time()
+
+    print(posterior, end_time-start_time)
 
     plt.figure()
-    plt.title(fr'Pooling distribuction  - $n$:{n}, $n_a$:{na}, $n_b$:{nb}, $n_c$:{n-na-nb}, p={p}')
+    plt.title(fr'Polling distribuction  - $n$:{n}, $n_a$:{na}, $n_b$:{nb}, $n_c$:{n-na-nb}, p={p}')
     plt.xlabel(r'$n_a$')
     plt.ylabel(r'$n_b$')
     plt.imshow(im,cmap='bwr')
-    plt.colorbar()
+    CB  = plt.colorbar()
+    CB.set_label(r'$p(\tilde{n}_a,\tilde{n}_b,\tilde{n}_c|n_a,n_b,n_c,I)$')
     plt.show()
 
 
