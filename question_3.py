@@ -198,8 +198,8 @@ if __name__ == "__main__":
     #Parameters
     N = 100
     n = 20
-    na = 9
-    nb = 5
+    na = 5
+    nb = 6
 
     posterior2 = result_polling2(N, n, na, nb)
 
