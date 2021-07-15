@@ -1,0 +1,14 @@
+Data
+N:100
+n:20
+na:6,
+nb:9
+nc:5
+===== RESULTS SECOND STEP =========
+A wins: 0.4566
+B wins: 0.3794
+C wins: 0.1638
+ABC tie: 0.0000
+AB tie: 0.0002
+AC tie: 0.0000
+BC tie: 0.0000
