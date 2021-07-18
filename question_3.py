@@ -44,7 +44,7 @@ def posterior(Na, Nb):
     fun = 3**(n-N)*(math.factorial(N-n))/(math.factorial(Na-na)*math.factorial(Nb-nb)*math.factorial(Nc-nc))
     return fun
 
-def result_polling2(N, n, na, nb):
+def result_polling3(N, n, na, nb):
     """
     Compute and print the focasted results for an election
     based on the polling data and the background information 
@@ -201,7 +201,7 @@ if __name__ == "__main__":
     na = 5
     nb = 6
 
-    posterior2 = result_polling2(N, n, na, nb)
+    posterior2 = result_polling3(N, n, na, nb)
 
     plt.figure()
     plt.title(fr'Second stage -  $N$:{N},  $n$:{n}, $n_a$:{na}, $n_b$:{nb}, $n_c$:{n-na-nb}')
