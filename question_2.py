@@ -171,7 +171,7 @@ def result_single_polling(N, n, na, nb):
     Return
     ------
     result: list
-        list of probabilities a party will win and the tie cases
+        list of probabilities a party will win and tie cases
     """
     gr = np.linspace(0,N,N+1).astype(int)
     grid=[perm for perm in itertools.product(gr,gr)]
@@ -231,13 +231,13 @@ def result_polling(dist):
     dist:  numpy array
         na, nb, nc distribuction (the result of polling_distriduction)
     """
-    x_nb,x_na = np.where(dist>0)
+    x_na,x_nb = np.where(dist>0)
     res_list = []
    
     result_list = []
     for a,b in zip(x_na,x_nb):
-        print(f'posterior: na,nb={a,b}, prob={dist[b][a]}')
-        res=np.array(result_single_polling(N,n,a,b))*dist[b][a]
+        print(f'posterior: na,nb={a,b}, prob={dist[a][b]}')
+        res=np.array(result_single_polling(N,n,a,b))*dist[a][b]
         result_list.append(res)
     result_list=np.vstack(result_list)
 
