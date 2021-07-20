@@ -30,7 +30,7 @@ def posterior(Na, Nb):
     Return
     ------
     fun: float
-        Posterior distribuction P(Na,Nb,Nc|na,nb,nc,I) ù
+        Posterior distribuction P(Na,Nb,Nc|na,nb,nc,I) 
         computed on Na, Nb
     """
     Nc = N-Na-Nb
