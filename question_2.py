@@ -259,10 +259,10 @@ def result_polling(dist):
 if __name__ == "__main__":
 
     #Parameters
-    N = 100
-    n = 20
-    na = 9
-    nb = 5
+    N = 10
+    n = 5
+    na = 2
+    nb = 1
     p = 0.2
     
     # print(polling_sampling(n,na,nb,p))
@@ -280,8 +280,8 @@ if __name__ == "__main__":
 
     plt.figure()
     plt.title(fr'Polling distribuction  - $n$:{n}, $n_a$:{na}, $n_b$:{nb}, $n_c$:{n-na-nb}, p={p}')
-    plt.xlabel(r'$n_a$')
-    plt.ylabel(r'$n_b$')
+    plt.xlabel(r'$\tilde{n}_a$')
+    plt.ylabel(r'$\tilde{n}_b$')
     plt.imshow(im,cmap='bwr')
     CB  = plt.colorbar()
     CB.set_label(r'$p(\tilde{n}_a,\tilde{n}_b,\tilde{n}_c|n_a,n_b,n_c,I)$')
