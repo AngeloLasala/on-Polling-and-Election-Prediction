@@ -12,7 +12,7 @@ if C loses first stage, the people vote A will vote for A with probability p3 at
 
 The party with more votes ath the end of the second stage will win the election
 
-By Bayesian theory of probability and plausible reasoning, the probability 
+By frequentist aproach, the probability 
 P("a party will wins"|I) is computed
 """
 
@@ -47,10 +47,30 @@ def posterior(Na, Nb):
     fun = 3**(n-N)*(math.factorial(N-n))/(math.factorial(Na-na)*math.factorial(Nb-nb)*math.factorial(Nc-nc))
     return fun
 
-def result_polling4(N, n, na, nb, p1, p2, p3):
+def first_stage_dist(N, n, na, nb):
     """
-    Compute and print the focasted results for an election
-    and return a list of probabilities distribuction of votes"
+    Retirn the posterior distribution after the first stage
+    given the polled data and the background information 
+    
+    Parameters
+    ----------
+    N: integer
+        number of people that vote 
+
+    n: integer
+        number of polled people
+
+    na: integer
+        number of polled people say vote A
+
+    na: integer
+        number of polled people say vote B
+
+    Return
+    ------
+    fist_stage_com: list
+        List of lists of all possibile combination (Na,Nb)
+        given the polled data
     """
     a = np.linspace(0,N,N+1).astype(int)
     grid=[perm for perm in itertools.product(a,a)]
@@ -58,141 +78,182 @@ def result_polling4(N, n, na, nb, p1, p2, p3):
 
     tot = 0
     comb = 0
-    A_win = 0
-    B_win = 0
-    C_win = 0
-    ABC_tie = 0
-    AB_tie = 0
-    AC_tie = 0
-    BC_tie = 0
-
+  
+    im = np.zeros((N,N))
     for Na, Nb in grid:
         if (Na>=na) and (Nb>=nb) and (N-Na-Nb>=n-na-nb):
-            # print(f'{(Na,Nb)}: p={posterior(Na,Nb)}')
+            print(f'{(Na,Nb)}: p={posterior(Na,Nb)}')
+            im[Nb][Na]=posterior(Na,Nb)
+
             tot=tot+posterior(Na,Nb)
             comb=comb+1
+            
+    print(f'check total p: {"%.4f" % tot}\n')
+    print(f'combination: {comb}')
 
-            #A lose
-            if Na<Nb and Na<N-Na-Nb:
-                rand=random.uniform(0,1)
-                if rand<=p1:
-                    if Na+Nb>N-Na-Nb: B_win=B_win+posterior(Na,Nb)
-                    if Na+Nb<N-Na-Nb: C_win=C_win+posterior(Na,Nb)
-                    if Na+Nb==N-Na-Nb: BC_tie=BC_tie+posterior(Na,Nb)
-                if rand>p1:
-                    if Na+N-Na-Nb>Nb: C_win=C_win+posterior(Na,Nb)
-                    if Na+N-Na-Nb<Nb: B_win=B_win+posterior(Na,Nb)
-                    if Na+N-Na-Nb==Nb: BC_tie=BC_tie+posterior(Na,Nb)
+    x_na,x_nb = np.where(im>0)
+    fist_stage_com=[[a,b] for a,b in zip(x_na,x_nb)]
+  
 
-            #B lose
-            if Nb<Na and Nb<N-Na-Nb:
-                rand=random.uniform(0,1)
-                if rand<=p2:
-                    if Nb+N-Na-Nb>Na: C_win=C_win+posterior(Na,Nb)
-                    if Nb+N-Na-Nb<Na: A_win=A_win+posterior(Na,Nb)
-                    if Nb+N-Na-Nb==Na: AC_tie=AC_tie+posterior(Na,Nb)
-                if rand>p2:
-                    if Nb+Na>N-Na-Nb: A_win=A_win+posterior(Na,Nb)
-                    if Nb+Na<N-Na-Nb: C_win=C_win+posterior(Na,Nb)
-                    if Nb+Na==N-Na-Nb: AC_tie=AC_tie+posterior(Na,Nb)
+    return fist_stage_com
+
+def second_stage_single_comb(N, Na, Nb, p1, p2, p3):
+    """
+    Given the first stage result and the polled data
+    return the value of vites on the second stage 
+    following the background information
+
+    Parameters
+    ----------
+    N: integer
+        number of people that vote 
+
+    Na: integer
+        number of people vote A on fist stage
+
+    Nb: integer
+        number of polled vote B on fist stage
+
+    p1: float in range (0,1)
+
+    p2: float in range (0,1)
+
+    p3: float in range (0,1)
+
+    Return
+    ------
+    NNa: integer
+        a possible number of people vote for A on second stage
+
+    NNb: integer
+        a possible number of people vote for B on second stage
+    """
+    Nc = N-Na-Nb
+
+    NNa = Na
+    NNb = Nb
+    NNc = Nc
+
+    #A loses on first stage
+    if Na<Nb and Na<N-Na-Nb:
+        NNa=0
+        rand=random.uniform(0,1)
+        if rand<=p1:
+            NNb=Nb+Na
+        if rand>p1:
+            NNc=Nc+Na
+
+    #B loses on first stage
+    if Nb<Na and Nb<N-Na-Nb:
+        NNb=0
+        rand=random.uniform(0,1)
+        if rand<=p2:
+            NNc=Nc+Nb
+        if rand>p2:
+            NNa=Na+Nc
+
+    #c loses on first stage
+    if N-Na-Nb<Na and N-Na-Nb<Nb:
+        NNc=0
+        rand=random.uniform(0,1)
+        if rand<=p3:
+            NNa=Na+Nc
+        if rand>p2:
+            NNb=Nb+Nc
+
+    print(f'1 stage: A={Na}, B={Nb}, C={N-Na-Nb} - 2 stage: A={NNa}, B={NNb}, C={N-NNa-NNb}')
+
+    return NNa,NNb
+
+def second_stage_dist(N, n, na, nb, p1, p2, p3):
+    """
+    Return the distribuction of N'a, N'b, N'c 
+    given a probability tthe results on fist stage, the polled data
+    and the backgroung information.
+
+    Parameters
+    ----------
+    N: integer
+        number of people that vote 
+
+    n: integer
+        number of polled people
+
+    na: integer
+        number of polled people say vote A
+
+    na: integer
+        number of polled people say vote B
+    
+    p1: float in range (0,1)
+
+    p2: float in range (0,1)
+
+    p3: float in range (0,1)
 
 
-            #C lose
-            if N-Na-Nb<Na and N-Na-Nb<Nb :
-                rand=random.uniform(0,1)
-                if rand<=p3:
-                    if Na+N-Na-Nb>Nb: A_win=A_win+posterior(Na,Nb)
-                    if Na+N-Na-Nb<Nb: B_win=B_win+posterior(Na,Nb)
-                    if Na+N-Na-Nb==Nb: AB_tie=AB_tie+posterior(Na,Nb)
-                if rand>p3:
-                    if Nb+N-Na-Nb>Na: B_win=B_win+posterior(Na,Nb)
-                    if Nb+N-Na-Nb<Na: A_win=A_win+posterior(Na,Nb)
-                    if Nb+N-Na-Nb==Na: AB_tie=AB_tie+posterior(Na,Nb)
+    Returns
+    -------
+    im: numpy array
+        Second stage distribuction P(N'a,N'b,N'c|Na,Nb,Nc,na,nb,nc,I)
+    """
 
-            #ABC tie
-            if Nb==Na and N-Na-Nb==Na:
-                ABC_tie=ABC_tie+posterior(Na,Nb)
+    a = np.linspace(0,N,N+1).astype(int)
+    grid=[perm for perm in itertools.product(a,a)]
+    # print(f'len: {len(grid)}')
 
-            #AB tie and C wins
-            if Na==Nb and N-Na-Nb>Na:
-                C_win=C_win+posterior(Na,Nb)
+    im = np.zeros((N,N))
+    im2 = np.zeros((N,N))
+    for Na, Nb in grid:
+        Nc = N-Na-Nb
+        nc = n-na-nb
+        if (Na>=na) and (Nb>=nb) and (N-Na-Nb>=n-na-nb):
+            print(f'{(Na,Nb)}: p={posterior(Na,Nb)}')
+            im[Nb][Na]=posterior(Na,Nb)
 
-            #BC tie and A wins
-            if N-Na-Nb==Nb and Na>Nb:
-                A_win=A_win+posterior(Na,Nb)
+            if Na<Nb and Na<Nc:
+                im2[Nb+Na][0] = posterior(Na,Nb)*p1
+                im2[Nb][0] = posterior(Na,Nb)*(1-p1)
+                
+            if Nb<Na and Nb<Nc:
+                im2[0][Na] = posterior(Na,Nb)*p2
+                im2[0][Na+Nc] = posterior(Na,Nb)*(1-p2)
 
-            #AC tie and B wins
-            if N-Na-Nb==Na and Nb>Na:
-                B_win=B_win+posterior(Na,Nb)
+            if Nc<Na and Nc<Nb:
+                im2[Nb][Na+Nc] = posterior(Na,Nb)*p3
+                im2[Nb+Nc][Na] = posterior(Na,Nb)*(1-p3)
 
 
-    # print(f'check total p: {"%.4f" % tot}\n')
-    # print(f'combination: {comb}')
+    # comb = first_stage_dist(N, n, na, nb)
 
-    with open(f"Second stage (BIS)-N:{N}, n:{n}, na:{na}, nb:{nb}, nc:{n-na-nb}", 'w', encoding='utf-8') as file:
-        file.write(f"Data\n"
-                   f"N:{N}\nn:{n}\nna:{na},\nnb:{nb}\nnc:{n-na-nb}\n"
-                   f"===== RESULTS SECOND STEP =========\n"
-                   f'A wins: {"%.4f" % A_win}\n' 
-                   f'B wins: {"%.4f" % B_win}\n'
-                   f'C wins: {"%.4f" % C_win}\n'
-                   f'ABC tie: {"%.4f" % ABC_tie}\n'
-                   f'AB tie: {"%.4f" % AB_tie}\n'
-                   f'AC tie: {"%.4f" % AC_tie}\n'
-                   f'BC tie: {"%.4f" % BC_tie}\n')
+    # for a,b in comb:
+    #     NNa,NNb = second_stage_single_comb(N, a, b, p1, p2, p3)
+    #     print(f'1 stage: A={a}, B={b}, C={N-a-b} - 2 stage: A={NNa}, B={NNb}, C={N-NNa-NNb}')
+    return im, im2
+                
 
-    # print('===== RESULTS STEP 2 =========')
-    # print(f'A wins: {"%.4f" % A_win}')
-    # print(f'B wins: {"%.4f" % B_win}')
-    # print(f'C wins: {"%.4f" % C_win}')
-    # print(f'ABC tie: {"%.4f" % ABC_tie}')
-    # print(f'AB tie: {"%.4f" % AB_tie}')
-    # print(f'AC tie: {"%.4f" % AC_tie}')
-    # print(f'BC tie: {"%.4f" % BC_tie}')
-    # print(f'check: {A_win+B_win+C_win+ABC_tie+AB_tie+AC_tie+BC_tie}')
-    result = [A_win,B_win,C_win,ABC_tie,AB_tie,AC_tie,BC_tie]
-
-    return result
-
-    return result
-if __name__ == "__main__":
+if __name__=="__main__":
     #Parameters
-    N = 100
-    n = 20
-    na = 9
-    nb = 5
-    p1 = 0.30
-    p2 = 0.30
-    p3 = 0.30
+    N = 10
+    n = 5
+    na = 2
+    nb = 1
+    p1 = 0.50
+    p2 = 0.50
+    p3 = 0.50
 
-    posterior2 = result_polling4(N, n, na, nb, p1, p2, p3)
+    # comb= first_stage_dist(N, n, na, nb)
+    second_stage_single_comb(100, 5, 20, p1, p2, p3)
 
-    result_list = [result_polling4(N, n, na, nb, p1, p2, p3) for i in range (100000)]
-    result_list = np.vstack(result_list)
+    im1, im2 = second_stage_dist(N, n, na, nb, p1, p2, p3)
+    print(im2.sum())
 
-    result_list1 = [result_polling4(N, n, na, nb, 0.999, 0.999, 0.999) for i in range (100000)]
-    result_list1= np.vstack(result_list1)
-
-    print(result_list[:,0].mean())
-    
-    plt.figure(f'question 4: p1={p1}, p2={p2}, p3={p3}, 0.7 and 0.2 (red)', figsize=[18, 4.8])
-
-    plt.subplot(1,3,1)
-    plt.title('A wins')
-    plt.xlabel(f'mean: {"%.4f" % result_list[:,0].mean()}, mean1: {"%.4f" % result_list1[:,0].mean()}')
-    sns.histplot(result_list[:,0],stat="probability",kde=True)
-    sns.histplot(result_list1[:,0],stat="probability",kde=True,color='red')
-
-    plt.subplot(1,3,2)
-    plt.title('B wins')
-    plt.xlabel(f'mean: {"%.4f" % result_list[:,1].mean()}, mean1: {"%.4f" % result_list1[:,1].mean()}')
-    sns.histplot(result_list[:,1],stat="probability",kde=True)
-    sns.histplot(result_list1[:,0],stat="probability",kde=True,color='red')
-
-    plt.subplot(1,3,3)
-    plt.title('C wins')
-    plt.xlabel(f'mean: {"%.4f" % result_list[:,2].mean()}, mean1: {"%.4f" % result_list1[:,2].mean()}')
-    sns.histplot(result_list[:,2],stat="probability",kde=True)
-    sns.histplot(result_list1[:,0],stat="probability",kde=True,color='red')
-    
+    plt.figure()
+    plt.title(fr'SECOND STAGE  - $n$:{n}, $n_a$:{na}, $n_b$:{nb}, $n_c$:{n-na-nb}')
+    plt.xlabel(r'$N_a$')
+    plt.ylabel(r'$N_b$')
+    plt.imshow(im2,cmap='bwr')
+    CB  = plt.colorbar()
     plt.show()
+    
+   
