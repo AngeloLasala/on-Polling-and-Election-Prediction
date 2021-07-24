@@ -139,13 +139,39 @@ def posterior(Na, Nb, N, n, na, nb):
     Return
     ------
     fun: float
-        Posterior distribuction P(Na,Nb,Nc|na,nb,nc,I) ù
+        Posterior distribuction P(Na,Nb,Nc|na,nb,nc,I) 
         computed on Na, Nb
     """
     Nc = N-Na-Nb
     nc = n-na-nb
     fun = 3**(n-N)*(math.factorial(N-n))/(math.factorial(Na-na)*math.factorial(Nb-nb)*math.factorial(Nc-nc))
     return fun
+
+def posterior2(N, n, na, nb, dist):
+    """
+    """
+    #grid for Na, Nb, Nc
+    gr = np.linspace(0,N,N+1).astype(int)
+    grid=[perm for perm in itertools.product(gr,gr)]
+
+    #all combination of polled data na, nb, nc
+    x_na,x_nb = np.where(dist>0)
+    x_na = x_na.tolist()
+    x_nb = x_nb.tolist()
+    
+    im = np.zeros((N,N))
+    for Na, Nb in grid:
+        if (Na>=na) and (Nb>=nb) and (N-Na-Nb>=n-na-nb):
+            for a,b in zip(x_na,x_nb):
+                ress = []
+                if (Na>=a) and (Nb>=b) and (N-Na-Nb>=n-a-b):
+                    ress.append(posterior(Na, Nb, N, n, a, b)*dist[a][b])
+                    ress = np.array(ress)
+                    im[Na][Nb] = np.sum(ress)
+
+    print(f'ckeck post2: {np.sum(im)}')
+    return im
+ 
 
 def result_single_polling(N, n, na, nb):
     """
@@ -232,7 +258,6 @@ def result_polling(dist):
         na, nb, nc distribuction (the result of polling_distriduction)
     """
     x_na,x_nb = np.where(dist>0)
-    res_list = []
    
     result_list = []
     for a,b in zip(x_na,x_nb):
@@ -259,24 +284,24 @@ def result_polling(dist):
 if __name__ == "__main__":
 
     #Parameters
-    N = 10
-    n = 5
-    na = 2
-    nb = 1
-    p = 0.2
+    N = 100
+    n = 20
+    na = 9
+    nb = 5
+    p = 0.75
     
     # print(polling_sampling(n,na,nb,p))
     print("START!!!")
     start_time = time.time()
 
-    
     im = polling_distribuction(1000000)
-    x_nb,x_na = np.where(im>0)
-    posterior = result_polling(im)
+    post = result_polling(im)
 
     end_time = time.time()
 
-    print(posterior, end_time-start_time)
+    print(post, end_time-start_time)
+
+    
 
     plt.figure()
     plt.title(fr'Polling distribuction  - $n$:{n}, $n_a$:{na}, $n_b$:{nb}, $n_c$:{n-na-nb}, p={p}')
@@ -285,6 +310,7 @@ if __name__ == "__main__":
     plt.imshow(im,cmap='bwr')
     CB  = plt.colorbar()
     CB.set_label(r'$p(\tilde{n}_a,\tilde{n}_b,\tilde{n}_c|n_a,n_b,n_c,I)$')
+
     plt.show()
 
 
